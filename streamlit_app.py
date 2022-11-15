@@ -1,32 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
- 
-@Thelordsharky 
-OpenExoplanetCatalogue
-/
-oec_plots
-Public
-Code
-Issues
-Pull requests
-2
-Actions
-Projects
-Wiki
-Security
-Insights
-oec_plots/plot_mass_vs_semimajoraxis_discovery.python /
-@hannorein
-hannorein Added datestamp to scripts
-Latest commit 84987b7 on Dec 7, 2012
- History
- 1 contributor
-46 lines (42 sloc)  1.86 KB
 
 #!/usr/bin/python
 import xml.etree.ElementTree as ET
@@ -74,18 +45,4 @@ plotPlanetWithDiscoveryMethod("imaging")
 plotPlanetWithDiscoveryMethod("microlensing")
 
 gnuplot.stdin.close()
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-oec_plots/plot_mass_vs_semimajoraxis_discovery.python at master · OpenExoplanetCatalogue/oec_plots
+
