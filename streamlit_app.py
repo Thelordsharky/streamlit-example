@@ -1,4 +1,8 @@
 
+git clone git@github.com:hannorein/oec_plots.git
+cd oec_plots
+git submodule init
+git submodule update
 #!/usr/bin/python
 import xml.etree.ElementTree as ET
 import subprocess, glob, os, datetime
