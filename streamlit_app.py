@@ -1,38 +1,91 @@
-from collections import namedtuple
-import altair as alt
-import math
-import pandas as pd
-import streamlit as st
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+ 
+@Thelordsharky 
+OpenExoplanetCatalogue
+/
+oec_plots
+Public
+Code
+Issues
+Pull requests
+2
+Actions
+Projects
+Wiki
+Security
+Insights
+oec_plots/plot_mass_vs_semimajoraxis_discovery.python /
+@hannorein
+hannorein Added datestamp to scripts
+Latest commit 84987b7 on Dec 7, 2012
+ History
+ 1 contributor
+46 lines (42 sloc)  1.86 KB
 
-"""
-# Welcome to Streamlit!
+#!/usr/bin/python
+import xml.etree.ElementTree as ET
+import subprocess, glob, os, datetime
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
+# Open pipe gnuplot. You may want to change the terminal from svg to pdf for publication quality plots.
+gnuplot = subprocess.Popen(['gnuplot',"-persist"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+gnuplot.stdin.write("""
+set terminal svg
+set output "plot_mass_vs_semimajoraxis_discovery.svg"
+set xlabel "Semi-major axis [AU]"
+set ylabel "Planet mass [MJupiter]"
+set logscale xy
+set xrange [0.001:50]
+set yrange [0.008:350]
+set key top left
+set label "Data taken from the Open Exoplanet Catalogue. Last updated on """+datetime.date.today().isoformat()+"""." at screen 0.31,0.15 front font ",8"
+plot \
+"-" with point pt 7 lc 2 t "Radial velocity planets", \
+"-" with point pt 7 lc 3 t "Transiting planets",  \
+"-" with point pt 7 lc 1 t "Directly imaged planets", \
+"-" with point pt 7 lc 4 t "Microlensing planets"
+""")
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+def plotPlanetWithDiscoveryMethod(_discoverymethod):
+	for filename in glob.glob("open_exoplanet_catalogue/systems/*.xml"):
+		system = ET.parse(open(filename, 'r'))
+		planets = system.findall(".//planet")
+		for planet in planets:
+			try:
+				mass = float(planet.findtext("./mass"))
+				semimajoraxis = float(planet.findtext("./semimajoraxis"))
+				discoverymethod = planet.findtext("./discoverymethod")
+				if discoverymethod==_discoverymethod:
+					gnuplot.stdin.write("%e\t%e\n"%(mass, semimajoraxis))
+			except:
+				# Most likely cause for an exception: Mass or semi-major axis not specified for this planet.
+				# One could do a more complicated check here and see if the period and the mass of the host star is given and then calculate the semi-major axis 
+				pass
+	gnuplot.stdin.write("\ne\n")
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+plotPlanetWithDiscoveryMethod("RV")
+plotPlanetWithDiscoveryMethod("transit")
+plotPlanetWithDiscoveryMethod("imaging")
+plotPlanetWithDiscoveryMethod("microlensing")
 
-
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
-
-    Point = namedtuple('Point', 'x y')
-    data = []
-
-    points_per_turn = total_points / num_turns
-
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
-
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+gnuplot.stdin.close()
+Footer
+© 2022 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+oec_plots/plot_mass_vs_semimajoraxis_discovery.python at master · OpenExoplanetCatalogue/oec_plots
